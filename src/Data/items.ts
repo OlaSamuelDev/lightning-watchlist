@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 export const itemsData = [
   {
     title: "Avatar: The Way of Water",

@@ -14,7 +14,7 @@ export default class Grid
 
   static override _template(): Lightning.Component.Template<TileTemplateSpec> {
     return {
-      w: 1820,
+      w: 1670,
       h: 1080,
       Grid: {
         type: Row,

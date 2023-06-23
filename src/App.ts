@@ -1,8 +1,12 @@
 import { Lightning, Router, Utils } from "@lightningjs/sdk";
 import { routes } from "./Router";
+import Navbar from "./Widgets/Navbar";
 
 interface AppTemplateSpec extends Lightning.Component.TemplateSpec {
+  w: number;
+  h: number;
   Background: object;
+  Widgets: { Navbar: object };
 }
 
 export class App
@@ -21,6 +25,12 @@ export class App
     return {
       w: 1920,
       h: 1080,
+
+      Widgets: {
+        Navbar: {
+          type: Navbar,
+        },
+      },
     };
   }
 
