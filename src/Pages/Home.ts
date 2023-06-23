@@ -1,5 +1,5 @@
 // eslint-disable-next-line max-classes-per-file
-import { Lightning } from "@lightningjs/sdk";
+import { Lightning, Router } from "@lightningjs/sdk";
 import Grid from "../Components/Grid";
 import { itemsData } from "../Data/items";
 
@@ -31,6 +31,7 @@ export default class HomePage
         rect: true,
       },
       Home: {
+        x: 250,
         y: 100,
         Grid: {
           type: Grid,
@@ -39,8 +40,19 @@ export default class HomePage
     };
   }
 
+  /** Focus */
+  _index = 0;
+
   override _getFocused() {
     return this.Grid as unknown as Lightning.Component;
+  }
+
+  override _handleLeft() {
+    console.log("LEFT");
+    if (this._index === 0) {
+      Router.focusWidget("Navbar");
+    }
+    return true;
   }
 
   override _firstActive() {
