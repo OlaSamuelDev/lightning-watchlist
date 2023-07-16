@@ -1,65 +1,123 @@
-// eslint-disable-next-line max-classes-per-file
-import { Lightning, Router } from "@lightningjs/sdk";
-import Grid from "../Components/Grid";
-import { itemsData } from "../Data/items";
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { Lightning, Colors } from "@lightningjs/sdk";
+import { ItemData, homePageData$, watchlistData$ } from "../data/observables";
+import Gallery from "../Components/Gallery";
+import { Theme } from "../Utils/theme";
+import { Modal } from "../Components/Modal";
+import { combineLatest } from "rxjs";
 
 interface HomeTemplateSpec extends Lightning.Component.TemplateSpec {
-  Background: object;
-  Home: {
-    Grid: typeof Grid;
+  Wrapper: {
+    TitleBackground: object;
+    Title: object;
+    Gallery: typeof Gallery;
   };
+  Modal: typeof Modal;
 }
 
 export interface HomeTypeConfig extends Lightning.Component.TypeConfig {
   IsPage: true;
 }
 
-export default class HomePage
+export default class Home
   extends Lightning.Component<HomeTemplateSpec, HomeTypeConfig>
   implements Lightning.Component.ImplementTemplateSpec<HomeTemplateSpec>
 {
-  Grid = this.tag("Home.Grid")!;
-
   static override _template(): Lightning.Component.Template<HomeTemplateSpec> {
     return {
       w: 1920,
       h: 1080,
-      Background: {
-        w: 1920,
-        h: 1080,
-        color: 0xff10141f,
-        rect: true,
-      },
-      Home: {
-        x: 250,
-        y: 100,
-        Grid: {
-          type: Grid,
+      rect: true,
+      color: Colors(Theme.Background).get(),
+
+      Wrapper: {
+        x: 300, // width of navbar
+
+        TitleBackground: {
+          w: 1700,
+          h: 150,
+          x: -50,
+          rect: true,
+          color: Colors(Theme.Background).get(),
+          zIndex: 2,
         },
+
+        Title: {
+          y: 60,
+          zIndex: 3,
+          text: {
+            text: "What to watch? Recommended for you",
+            textColor: Colors(Theme.White).get(),
+            fontFace: "Avenir-Regular",
+            fontSize: 44,
+          },
+        },
+
+        Gallery: {
+          type: Gallery,
+          y: 180,
+          signals: {
+            action: "action",
+          },
+        },
+      },
+
+      Modal: {
+        type: Modal,
+        signals: {
+          closeModal: "closeModal",
+        },
+        visible: false,
       },
     };
   }
 
-  /** Focus */
-  _index = 0;
+  Gallery = this.getByRef("Wrapper")!.getByRef("Gallery")!;
+
+  override _active() {
+    combineLatest([homePageData$(), watchlistData$()]).subscribe(
+      ([itemsData, bookmarks]) => {
+        const homePageData = itemsData.map((item) => {
+          const items: ItemData = { ...item, isBookmarked: false };
+          bookmarks.forEach((item) => {
+            if (items.title === item.title) {
+              items.isBookmarked = true;
+            }
+          });
+          return items;
+        });
+
+        this.Gallery.items = homePageData;
+      }
+    );
+    this._refocus();
+  }
+
+  isModalOpen = false;
 
   override _getFocused() {
-    return this.Grid as unknown as Lightning.Component;
-  }
-
-  override _handleLeft() {
-    console.log("LEFT");
-    if (this._index === 0) {
-      Router.focusWidget("Navbar");
+    if (this.isModalOpen) {
+      return this.getByRef("Modal");
     }
-    return true;
+    return this.Gallery;
   }
 
-  override _firstActive() {
-    this.Grid.patch({
-      // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-      //@ts-ignore
-      items: itemsData,
+  action(info: ItemData) {
+    this.isModalOpen = true;
+    this.patch({
+      Modal: {
+        items: info,
+        visible: true,
+      },
+    });
+  }
+
+  closeModal() {
+    this.isModalOpen = false;
+    this.patch({
+      Modal: {
+        visible: false,
+      },
     });
   }
 }

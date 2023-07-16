@@ -3,29 +3,18 @@ import { routes } from "./Router";
 import Navbar from "./Widgets/Navbar";
 
 interface AppTemplateSpec extends Lightning.Component.TemplateSpec {
-  w: number;
-  h: number;
-  Background: object;
-  Widgets: { Navbar: object };
+  Widgets: { Navbar: typeof Navbar };
 }
 
 export class App
-  extends Lightning.Component<AppTemplateSpec>
+  extends Router.App
   implements Lightning.Component.ImplementTemplateSpec<AppTemplateSpec>
 {
-  /*
-   * The following properties exist to make it more convenient to access elements
-   * below in a type-safe way. They are optional.
-   *
-   * See https://lightningjs.io/docs/#/lightning-core-reference/TypeScript/Components/TemplateSpecs?id=using-a-template-spec
-   * for more information.
-   */
-
   static override _template(): Lightning.Component.Template<AppTemplateSpec> {
     return {
+      ...super._template(),
       w: 1920,
       h: 1080,
-
       Widgets: {
         Navbar: {
           type: Navbar,
@@ -37,8 +26,12 @@ export class App
   static getFonts() {
     return [
       {
-        family: "Regular",
-        url: Utils.asset("fonts/Roboto-Regular.ttf") as string,
+        family: "Avenir-Regular",
+        url: Utils.asset("fonts/Avenir-Regular.ttf") as string,
+      },
+      {
+        family: "Avenir-Bold",
+        url: Utils.asset("fonts/Avenir-Bold.ttf") as string,
       },
     ];
   }
@@ -46,5 +39,9 @@ export class App
   override async _setup() {
     super._setup();
     Router.startRouter(routes, this);
+  }
+
+  override _init() {
+    Router.focusWidget("Navbar");
   }
 }

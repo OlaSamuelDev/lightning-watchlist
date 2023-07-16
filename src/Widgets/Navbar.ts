@@ -1,122 +1,105 @@
-import { Lightning, Router, Utils } from "@lightningjs/sdk";
+/* eslint-disable @typescript-eslint/no-non-null-assertion */
+import { Lightning, Router, Colors } from "@lightningjs/sdk";
+import { Theme } from "../Utils/theme";
+import Icon from "../Components/Icon";
 
-interface NavbarSpec extends Lightning.Component.TemplateSpec {
-  HomeLink: object;
-  WatchlistLink: object;
+interface NavbarTemplateSpec extends Lightning.Component.TemplateSpec {
+  HomeLink: typeof Icon;
+  WatchlistLink: typeof Icon;
 }
 
 export default class Navbar
-  extends Lightning.Component<NavbarSpec>
-  implements Lightning.Component.ImplementTemplateSpec<NavbarSpec>
+  extends Lightning.Component<NavbarTemplateSpec>
+  implements Lightning.Component.ImplementTemplateSpec<NavbarTemplateSpec>
 {
-  static selectedHighlightStyles = {
-    highlight: true,
-    highlightOffset: 2,
-    highlightColor: 0xffc09d7b,
-  };
-
-  static override _template() {
+  static override _template(): Lightning.Component.Template<NavbarTemplateSpec> {
     return {
-      w: Navbar.width,
-      h: 1720,
-      shader: { type: Lightning.shaders.RoundedRectangle, radius: 50 },
-      color: 0xff10141f,
-      flex: {
-        paddingTop: 50,
-        paddingRight: 50,
-        paddingBottom: 50,
-        paddingLeft: 50,
+      rect: true,
+      w: 180,
+      h: 860,
+      y: 60,
+      x: 60,
+      zIndex: 5,
+      color: Colors(Theme.Secondary).get(),
+      shader: {
+        type: Lightning.shaders.RoundedRectangle,
+        radius: 30,
       },
-
-      Items: {
-        w: 150,
-        h: 880,
-        rect: true,
-        color: 0xff161d2f,
-        flex: {
-          direction: "column",
-          alignItems: "center",
-          paddingTop: 100,
+      flex: {
+        direction: "column",
+        alignItems: "center",
+        paddingTop: 100,
+      },
+      HomeLink: {
+        type: Icon,
+        w: 30,
+        h: 30,
+        icon: {
+          src: "icons/home.svg",
+          width: 30,
+          height: 30,
         },
-
-        HomeLink: {
-          zIndex: 1,
-          texture: lng.Tools.getSvgTexture(
-            Utils.asset("images/home.svg"),
-            30,
-            30
-          ),
-        },
-        WatchlistLink: {
-          y: 50,
-          zIndex: 1,
-          alpha: 0.3,
-          texture: lng.Tools.getSvgTexture(
-            Utils.asset("images/bookmark-filled.svg"),
-            25,
-            30
-          ),
+      },
+      WatchlistLink: {
+        w: 25,
+        h: 30,
+        y: 50,
+        type: Icon,
+        icon: {
+          src: "icons/bookmark-filled.svg",
+          width: 25,
+          height: 30,
         },
       },
     };
   }
 
-  static width = 150;
+  _focused!: "homeLink" | "watchlistLink";
 
-  focusedChild = "HomeLink";
+  HomeLink = this.getByRef("HomeLink")!;
 
-  _handleChildFocus() {
-    this.patch({
-      HomeLink: {
-        text: {
-          highlight: this.focusedChild === "HomeLink",
-        },
-      },
-    });
+  WatchlistLink = this.getByRef("WatchlistLink")!;
+
+  override _firstActive() {
+    this._focused = "homeLink";
   }
 
-  override _focus() {
-    this._handleChildFocus();
+  override _getFocused() {
+    if (this._focused === "homeLink") {
+      return this.getByRef("HomeLink");
+    }
+    return this.getByRef("WatchlistLink");
   }
 
-  override _unfocus() {
-    this.patch({
-      HomeLink: {
-        text: {
-          highlight: false,
-        },
-      },
-      WatchlistLink: {
-        text: {
-          highlight: false,
-        },
-      },
-    });
-  }
-
-  override _handleEnter() {
-    if (this.focusedChild === "HomeLink") {
-      Router.navigate("home");
+  override _handleUp() {
+    if (this._focused === "watchlistLink") {
+      this._focused = "homeLink";
     } else {
-      Router.navigate("watchlist");
+      this._focused = "homeLink";
     }
   }
 
   override _handleDown() {
-    if (this.focusedChild === "HomeLink") {
-      this.focusedChild = "WatchlistLink";
+    if (this._focused === "homeLink") {
+      this._focused = "watchlistLink";
+    } else {
+      this._focused = "watchlistLink";
     }
-    this._handleChildFocus();
   }
 
-  override _handleUp() {
-    if (this.focusedChild === "WatchlistLink") {
-      this.focusedChild = "HomeLink";
-    }
-    this._handleChildFocus();
+  override _handleRight() {
+    Router.focusPage();
   }
 
   override _handleLeft() {
-    Router.focusPage();
+    return true;
+  }
+
+  override _handleEnter() {
+    if (this._focused === "homeLink") {
+      Router.navigate("home");
+    } else {
+      Router.navigate("watchlist");
+    }
   }
 }
