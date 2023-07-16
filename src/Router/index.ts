@@ -1,17 +1,24 @@
 import type { Router } from "@lightningjs/sdk";
-import HomePage from "../Pages/Home";
-import WatchlistPage from "../Pages/Watchlist";
+import Home from "../Pages/Home";
+import Watchlist from "../Pages/Watchlist";
+import Edit from "../Pages/Edit";
 
 export const routes: Router.Config = {
   root: "home",
   routes: [
     {
-      path: "watchlist",
-      component: WatchlistPage,
+      path: "home",
+      component: Home,
+      widgets: ["navbar"],
     },
     {
-      path: "home",
-      component: HomePage,
+      path: "watchlist",
+      component: Watchlist,
+      widgets: ["navbar"],
+    },
+    {
+      path: "edit/:title",
+      component: Edit,
     },
   ],
 };
