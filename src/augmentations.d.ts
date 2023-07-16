@@ -5,9 +5,9 @@
  *
  * @module
  */
-import '@lightningjs/sdk'
+import "@lightningjs/sdk";
 
-declare module '@lightningjs/sdk' {
+declare module "@lightningjs/sdk" {
   /**
    * Lightning Core Augmentations
    */
