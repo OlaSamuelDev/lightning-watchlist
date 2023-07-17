@@ -118,7 +118,7 @@ export class Form
 
           Title: {
             type: Input,
-            fieldText: "Title",
+            valueText: "Title",
             flexItem: {
               marginBottom: 30,
             },
@@ -141,7 +141,7 @@ export class Form
 
           Year: {
             type: Input,
-            fieldText: "Year",
+            valueText: "Year",
           },
         },
 
@@ -217,10 +217,10 @@ export class Form
           },
           Inputs: {
             Title: {
-              fieldText: this.title,
+              valueText: this.title,
             },
             Year: {
-              fieldText: this.year,
+              valueText: this.year,
             },
           },
         },
@@ -267,30 +267,30 @@ export class Form
   keyPressed(key: string) {
     if (this.formFocusIndex === 0) {
       this.title = `${this.title}${key}`;
-      this.Title.fieldText = this.title;
+      this.Title.valueText = this.title;
     } else {
       this.year = `${this.year}${key}`;
-      this.Year.fieldText = this.year;
+      this.Year.valueText = this.year;
     }
   }
 
   spacePressed() {
     if (this.formFocusIndex === 0) {
       this.title = `${this.title} `;
-      this.Title.fieldText = this.title;
+      this.Title.valueText = this.title;
     } else {
       this.year = `${this.year} `;
-      this.Year.fieldText = this.year;
+      this.Year.valueText = this.year;
     }
   }
 
   backspacePressed() {
     if (this.formFocusIndex === 0) {
       this.title = this.title.substring(0, this.title.length - 1);
-      this.Title.fieldText = this.title;
+      this.Title.valueText = this.title;
     } else {
       this.year = this.year.substring(0, this.year.length - 1);
-      this.Year.fieldText = this.year;
+      this.Year.valueText = this.year;
     }
   }
 
@@ -369,12 +369,12 @@ export class Form
           bookMarkData = itemsData;
         });
 
-        const checkifMatch = itemsData.filter(
+        const matchingData = itemsData.filter(
           (data) =>
             data.title === this.title && data.year.toString() === this.year
         );
 
-        if (checkifMatch.length === 0) {
+        if (matchingData.length === 0) {
           const newData = itemsData.map((item) => {
             const itemData = { ...item, isBookmarked: false };
             bookMarkData.forEach((bookmark) => {
@@ -387,8 +387,10 @@ export class Form
               itemData.title = this.title;
               itemData.year = parseInt(this.year, 10);
             }
+
             return itemData;
           });
+
           updateHomeData(newData);
         }
       }

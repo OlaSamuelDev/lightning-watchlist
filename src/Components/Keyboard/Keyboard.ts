@@ -172,19 +172,6 @@ export default class Keyboard
     return this.getFocusedSection(this.focusedSection);
   }
 
-  override _handleEnter() {
-    if (this.focusedSection === "special") {
-      this.signal(
-        this.specialIndex === 0 ? "spacePressed" : "backspacePressed"
-      );
-    }
-
-    if (this.focusedSection === "main") {
-      const key = this._getFocused() as Key;
-      this.signal("keyPressed", key.title || "");
-    }
-  }
-
   override _handleUp() {
     if (this.focusedSection === "main") {
       if (this.mainIndex < this.keyboardColumns) {
@@ -259,6 +246,19 @@ export default class Keyboard
       } else {
         return false;
       }
+    }
+  }
+
+  override _handleEnter() {
+    if (this.focusedSection === "special") {
+      this.signal(
+        this.specialIndex === 0 ? "spacePressed" : "backspacePressed"
+      );
+    }
+
+    if (this.focusedSection === "main") {
+      const key = this._getFocused() as Key;
+      this.signal("keyPressed", key.title || "");
     }
   }
 }

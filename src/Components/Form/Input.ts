@@ -3,12 +3,13 @@ import { Theme } from "../../Utils/theme";
 
 interface FieldTemplateSpec extends Lightning.Component.TemplateSpec {
   Container: {
-    Field: {
-      Fields: object;
+    Input: {
+      Input: object;
     };
-    Text: object;
+    Value: object;
   };
-  fieldText: string;
+
+  valueText: string;
   isFocused: boolean;
 }
 
@@ -28,7 +29,7 @@ export class Input
           justifyContent: "center",
         },
 
-        Field: {
+        Input: {
           w: 580,
           h: 60,
           rect: true,
@@ -41,7 +42,7 @@ export class Input
           },
         },
 
-        Text: {
+        Value: {
           y: -44,
           text: {
             text: "",
@@ -55,22 +56,22 @@ export class Input
     };
   }
 
-  shouldStayFocused = false;
+  remainFocused = false;
 
-  set fieldText(text: string) {
+  set valueText(text: string) {
     this.patch({
       Container: {
-        Text: {
+        Value: {
           text: { text },
         },
       },
     });
   }
 
-  makeFieldFocused(isFocused: boolean) {
+  styleFocusedInput(isFocused: boolean) {
     this.patch({
       Container: {
-        Field: {
+        Input: {
           shader: isFocused
             ? {
                 strokeColor: Colors(Theme.Light).get(),
@@ -79,24 +80,21 @@ export class Input
                 strokeColor: Colors(Theme.White).get(),
               },
         },
-        Text: {
-          color: Colors(isFocused ? Theme.Light : Theme.White).get(),
-        },
       },
     });
   }
 
   set isFocused(isFocused: boolean) {
-    this.makeFieldFocused(isFocused);
-    this.shouldStayFocused = isFocused;
+    this.styleFocusedInput(isFocused);
+    this.remainFocused = isFocused;
   }
 
   override _focus() {
-    this.makeFieldFocused(true);
+    this.styleFocusedInput(true);
   }
 
   override _unfocus() {
-    this.makeFieldFocused(this.shouldStayFocused);
-    this.shouldStayFocused = false;
+    this.styleFocusedInput(this.remainFocused);
+    this.remainFocused = false;
   }
 }
